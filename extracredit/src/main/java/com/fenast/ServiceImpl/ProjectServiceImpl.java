@@ -15,7 +15,7 @@ public class ProjectServiceImpl implements IProjectService {
 	public void createProject(String title) {
 		Project p = new Project();
 		p.setTitle(title);
-		projectdao.create(p);
+		projectdao.save(p);
 	}
 
 

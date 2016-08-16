@@ -3,9 +3,9 @@ package com.fenast.dao;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 public abstract class AbstractHibernateDAO<T extends Serializable> {
@@ -14,32 +14,35 @@ public abstract class AbstractHibernateDAO<T extends Serializable> {
 	@PersistenceContext
 	private SessionFactory sessionFactory;
 	
-	public final void setClazz( Class<T> clazzToSet) {
+	public final void setClazz(final Class<T> clazzToSet) {
 		this.clazz = clazzToSet;
 	}
 	
-	public T findOne(long id) {
+	public T findOne(final long id) {
 		return (T) getCurrentSession().get(clazz,id);
 	}
 	
 	public List<T> findAll() {
-		return sessionFactory.createQuery("From" + clazz.getName()).getResultList();
+		return getCurrentSession().createQuery("From" + clazz.getName()).list();
 	}
 	
-	public void create(T entity) {
-		sessionFactory.persist(entity);
+	public void save(final T entity) {
+		getCurrentSession().persist(entity);
 	}
 	
-	public T update(T entity) {
-		return sessionFactory.merge(entity);
+	public T update(final T entity) {
+		return (T) getCurrentSession().merge(entity);
 	}
 	
-	public void delete(T entity) {
-		sessionFactory.remove(entity);
+	public void delete(final T entity) {
+		getCurrentSession().delete(entity);
 	}
 	
-	public void deleteById(long entityId) {
-		T entity = findOne(entityId);
+	public void deleteById(final long entityId) {
+		final T entity = findOne(entityId);
 		delete(entity);
+	}
+	protected final Session getCurrentSession() {
+		return sessionFactory.getCurrentSession();
 	}
 }
